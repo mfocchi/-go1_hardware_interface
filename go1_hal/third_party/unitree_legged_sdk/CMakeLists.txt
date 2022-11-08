@@ -15,7 +15,7 @@ if("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "aarch64.*")
 endif()
 
 link_directories(lib/cpp/${ARCH})
-set(EXTRA_LIBS -pthread libunitree_legged_sdk.so)
+set(EXTRA_LIBS -pthread libunitree_legged_sdk.a)
 
 set(CMAKE_CXX_FLAGS "-O3 -fPIC")
 
@@ -43,3 +43,67 @@ install(TARGETS
 install(DIRECTORY lib/cpp/${ARCH}/
   DESTINATION lib/unitree
   USE_SOURCE_PERMISSIONS)
+
+
+#######
+#Domingo stuff create dynamic library from static
+#######
+
+
+set(INCLUDE_INSTALL_DIR include)  # include
+set(LIBRARY_INSTALL_DIR lib)
+set(ConfigFileInstallDir lib/cmake/unitree_legged_sdk)
+add_library(unitree_legged_sdk INTERFACE)
+
+target_include_directories(unitree_legged_sdk
+  INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>  
+)
+
+target_link_libraries(unitree_legged_sdk
+  INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/lib/cpp/${ARCH}/libunitree_legged_sdk.a>
+    $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/${LIBRARY_INSTALL_DIR}/libunitree_legged_sdk.a>
+    lcm
+)
+
+# #######
+# INSTALL
+# #######
+install(DIRECTORY
+  ${PROJECT_SOURCE_DIR}/include/
+  DESTINATION include
+)
+install(FILES
+  ${PROJECT_SOURCE_DIR}/lib/cpp/${ARCH}/libunitree_legged_sdk.a
+  DESTINATION ${LIBRARY_INSTALL_DIR}
+)
+install(TARGETS unitree_legged_sdk
+EXPORT unitreesdkTargets
+RUNTIME DESTINATION bin COMPONENT Runtime
+LIBRARY DESTINATION lib COMPONENT Runtime
+ARCHIVE DESTINATION lib COMPONENT Development
+PUBLIC_HEADER DESTINATION include COMPONENT Development
+BUNDLE DESTINATION bin COMPONENT Runtime
+)
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+"${PROJECT_SOURCE_DIR}/cmake/unitree_legged_sdkConfig.cmake.in"
+"${PROJECT_BINARY_DIR}/unitree_legged_sdkConfig.cmake"
+INSTALL_DESTINATION "${ConfigFileInstallDir}"
+PATH_VARS INCLUDE_INSTALL_DIR LIBRARY_INSTALL_DIR
+)
+
+
+export( # Creates Targets.cmake for build tree
+EXPORT unitreesdkTargets
+FILE "${PROJECT_BINARY_DIR}/unitreesdkTargets.cmake"
+)
+install( # Creates Targets.cmake referencing the relocatable install location
+EXPORT unitreesdkTargets
+FILE unitreesdkTargets.cmake
+DESTINATION "${ConfigFileInstallDir}"
+)
+
