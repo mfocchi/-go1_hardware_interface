@@ -6,7 +6,7 @@ project(go1_hal)
 
 # Ensures CMake creates the file compile_commands.json (Required for Vim-YCM)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_FIND_DEBUG_MODE TRUE)
+set(CMAKE_FIND_DEBUG_MODE FALSE)
 
 set(VERSION 0.1.0)
 
@@ -25,28 +25,20 @@ set(ConfigFileInstallDir lib/cmake/go1hal)
 # ###################
 
 # Unitree-SDK dependency
-#find_package(unitreesdk REQUIRED)
-#if(NOT unitreesdk_FOUND)
-  # Compile and install unitreesdk if it is not already installed
-#  add_subdirectory(third_party/unitree_legged_sdk)
-#endif()
+find_package(unitree_legged_sdk QUIET)
+if(NOT unitree_legged_sdk_FOUND)
+ # Compile and install unitreesdk if it is not already installed
+ add_subdirectory(third_party/unitree_legged_sdk)
+endif()
 
 # add_library(go1hal STATIC  # TODO: decide if want it static or dynamic
 add_library(go1hal SHARED
   src/go1_hal.cpp
 )
 
-set(THIRD_PARTY_DIR ${PROJECT_SOURCE_DIR}/third_party/
-    CACHE STRING "Third party directory where the unitree_legged_sdk and the pybind11 libraries are stored"
-)
-
-add_library(libunitree_legged_sdk STATIC IMPORTED)
-set_target_properties(libunitree_legged_sdk PROPERTIES IMPORTED_LOCATION ${THIRD_PARTY_DIR}/unitree_legged_sdk/lib/cpp/amd64/libunitree_legged_sdk.a)
-set_target_properties(libunitree_legged_sdk PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${THIRD_PARTY_DIR}/unitree_legged_sdk/include)
-
 target_link_libraries(go1hal
   PUBLIC
-    libunitree_legged_sdk
+  unitree_legged_sdk
 )
 
 target_include_directories(go1hal
