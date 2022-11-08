@@ -147,6 +147,7 @@ void Go1RobotHw::send_zero_command()
 {
     std::array<float, 60> zero_command = {0};
     // go1_interface_->SendCommand(zero_command);
+    //IMPORTANT! this ensures all the Kp Kd gains are set to zero
     go1_interface_.SendCommand(zero_command);
 }
 

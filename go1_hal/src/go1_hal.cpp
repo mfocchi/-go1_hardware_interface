@@ -15,6 +15,7 @@ LowLevelInterface::LowLevelInterface(): safe_(unitree::LeggedType::Go1), udp_(un
     udp_.InitCmdData(lowcmd_);
 
     lowstate_.imu.quaternion[0] = 1.;
+    lowstate_.levelFlag = unitree::LOWLEVEL;
 }
 
 LowState LowLevelInterface::ReceiveObservation()
