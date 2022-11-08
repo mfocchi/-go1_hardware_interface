@@ -97,13 +97,4 @@ PATH_VARS INCLUDE_INSTALL_DIR LIBRARY_INSTALL_DIR
 )
 
 
-export( # Creates Targets.cmake for build tree
-EXPORT unitreesdkTargets
-FILE "${PROJECT_BINARY_DIR}/unitreesdkTargets.cmake"
-)
-install( # Creates Targets.cmake referencing the relocatable install location
-EXPORT unitreesdkTargets
-FILE unitreesdkTargets.cmake
-DESTINATION "${ConfigFileInstallDir}"
-)
 

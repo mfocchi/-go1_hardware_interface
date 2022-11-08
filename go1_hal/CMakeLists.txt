@@ -134,20 +134,21 @@ write_basic_package_version_file(
   # COMPATIBILITY ExactVersion
 )
 
-export( # Creates Targets.cmake for build tree
-  EXPORT go1halTargets
-  FILE "${PROJECT_BINARY_DIR}/go1halTargets.cmake"
-)
-install( # Creates Targets.cmake referencing the relocatable install location
-  EXPORT go1halTargets
-  FILE go1halTargets.cmake
-  # DESTINATION lib/cmake  # TODO: Is it ok this? or do we need
-  DESTINATION "${ConfigFileInstallDir}"
-)
-install(FILES
-  "${PROJECT_BINARY_DIR}/go1halConfig.cmake"
-  "${PROJECT_BINARY_DIR}/go1halConfigVersion.cmake"
-  # "${PROJECT_BINARY_DIR}/unitreesdkTargets.cmake"
-  DESTINATION "${ConfigFileInstallDir}"
-)
+# export( # Creates Targets.cmake for build tree
+#   EXPORT go1halTargets
+#   FILE "${PROJECT_BINARY_DIR}/go1halTargets.cmake"
+# )
+# install( # Creates Targets.cmake referencing the relocatable install location
+#   EXPORT go1halTargets
+#   FILE go1halTargets.cmake
+#   # DESTINATION lib/cmake  # TODO: Is it ok this? or do we need
+#   DESTINATION "${ConfigFileInstallDir}"
+# )
+# install(FILES
+#   "${PROJECT_BINARY_DIR}/go1halConfig.cmake"
+#   "${PROJECT_BINARY_DIR}/go1halConfigVersion.cmake"
+#   # "${PROJECT_BINARY_DIR}/unitreesdkTargets.cmake"
+#   DESTINATION "${ConfigFileInstallDir}"
+# )
+
 

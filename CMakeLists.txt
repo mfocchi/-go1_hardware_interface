@@ -37,6 +37,8 @@ target_link_libraries(ros_control_node
   go1hal
 )
 
+
+
 set_property(TARGET ros_control_node PROPERTY CXX_STANDARD 11)  # At least std c++11
 
 #############
@@ -44,7 +46,7 @@ set_property(TARGET ros_control_node PROPERTY CXX_STANDARD 11)  # At least std c
 #############
 
 install(
-  TARGETS ros_control_node
+  TARGETS ros_control_node  test_go1_hal
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
