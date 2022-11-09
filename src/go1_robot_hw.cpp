@@ -137,8 +137,20 @@ void Go1RobotHw::read()
 
 void Go1RobotHw::write()
 {
+
     for (unsigned int jj = 0; jj < n_dof_; ++jj)
+    {
+      go1_lowcmd_.motorCmd[go1_motor_idxs_[jj]].mode = 0x0A;  // motor switch to servo (PMSM) mode
       go1_lowcmd_.motorCmd[go1_motor_idxs_[jj]].tau = static_cast<float>(joint_effort_command_[jj]  );
+      //these to be sure to have pure torque control mode
+      go1_lowcmd_.motorCmd[go1_motor_idxs_[jj]].q = unitree::PosStopF; 
+      go1_lowcmd_.motorCmd[go1_motor_idxs_[jj]].Kp = 0;
+      go1_lowcmd_.motorCmd[go1_motor_idxs_[jj]].dq = unitree::VelStopF; 
+      go1_lowcmd_.motorCmd[go1_motor_idxs_[jj]].Kd = 0;
+    }
+    go1_lowcmd_.head[0] = 0xFE;
+		go1_lowcmd_.head[1] = 0xEF;
+		go1_lowcmd_.levelFlag = unitree::LOWLEVEL;
 
     go1_interface_.SendLowCmd(go1_lowcmd_);
 }
