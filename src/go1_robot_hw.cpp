@@ -58,6 +58,18 @@ void Go1RobotHw::init()
       WolfRobotHwInterface::initializeJointsInterface(joint_names);
       registerInterface(&joint_state_interface_);
       registerInterface(&joint_effort_interface_);
+      velocityFilterBuffer.resize(joint_names.size());
+      for (unsigned int i = 0; i < joint_names.size(); i++)
+    	{
+	       //init velocity filters
+	       velocityFilterBuffer[i][0] = 0.0;
+	       velocityFilterBuffer[i][1] = 0.0;
+	       velocityFilterBuffer[i][2] = 0.0;
+	       velocityFilterBuffer[i][3] = 0.0;
+	       velocityFilterBuffer[i][4] = 0.0;
+	       velocityFilterBuffer[i][5] = 0.0;
+	}
+
     }
     else
     {
@@ -87,6 +99,51 @@ void Go1RobotHw::init()
 
 }
 
+
+void Go1RobotHw::filt(const double raw, butterFilterParams & buffer)
+{
+//notch filter cut-off 50 Hz; BW 20 Hz.
+//double a[3] = {1.0000000e+00,  -1.7633 ,  0.8541};
+//double b[3] = {0.9270 ,  -1.7633 ,  0.9270};
+//notch filter cut-off 110 Hz; BW 220 Hz.
+//double a[3] = {1.0000000e+00,  -0.8433 ,  0.0945};
+//double b[3] = {0.5473 ,  -0.8433 ,  0.5473};
+//2nd order butterworth cut 150 for fs = 1000 Hz
+//double a[3] = {1.0000000e+00,  -0.7478 ,  0.2722};
+//double b[3] = {0.1311 ,  0.2622 ,  0.1311};
+//2nd order butterworth cut 150 for fs = 2000 Hz
+//double a[3] = {1.0000 ,  -1.349 ,  0.5140};
+//double b[3] = {0.0413 ,  0.0825 ,  0.0413};
+//2nd order butterworth cut 150 for fs = 800 Hz
+//double a[3] = {1.0000 ,  -0.4629 ,  0.2097};
+//double b[3] = {0.1867 ,   0.3734 ,  0.1867};
+//2nd order butterworth cut 250 for fs = 1000 Hz
+    double a[3] = { 1.0000, 0.0000, 0.1716 };
+    double b[3] = { 0.2929, 0.5858, 0.2929 };
+//2nd order butterworth cut 40
+//double a[3] = {1.0000000e+00,  -3.6952738e-01 ,  1.9581571e-01};
+//double b[3] = {2.0657208e-01 ,  4.1314417e-01 ,  2.0657208e-01};
+//2nd order butterworth 30
+//double a[3] = {1.0000000e+00,  -7.4778918e-01,   2.7221494e-01};
+//double b[3] = {1.3110644e-01 ,  2.6221288e-01,   1.3110644e-01};
+//2nd order butterworth 15
+//double a[3] = {1.0000000e+00 , -1.3489677e+00 ,  5.1398189e-01 };
+//double b[3] = {4.1253537e-02 ,  8.2507074e-02,   4.1253537e-02};
+//2nd order butterworth 8
+//double a[3] = {1.0000000e+00 , -1.6474600e+00 ,  7.0089678e-01 };
+//double b[3] = {1.3359200e-02 ,  2.6718400e-02 ,  1.3359200e-02  };
+//first 3 elements are y0 y1 y2 second 3 x0 x1 x2
+    int input = 3;
+    buffer[input + 0] = raw;
+    buffer[0] = -a[1] * buffer[1] - a[2] * buffer[2] + b[0] * buffer[input + 0]
+            + b[1] * buffer[input + 1] + b[2] * buffer[input + 2];
+
+    buffer[input + 2] = buffer[input + 1];
+    buffer[input + 1] = buffer[input + 0];
+    buffer[2] = buffer[1];
+    buffer[1] = buffer[0];
+}
+
 void Go1RobotHw::read()
 {
     // Get robot data
@@ -98,7 +155,10 @@ void Go1RobotHw::read()
     for (unsigned int jj = 0; jj < n_dof_; ++jj)
     {
         joint_position_[jj] = static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].q)     ;
-        joint_velocity_[jj] = static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].dq)    ;
+
+	filt(static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].dq) , velocityFilterBuffer[jj]);
+        joint_velocity_[jj] = velocityFilterBuffer[jj][0];
+
         joint_effort_[jj]   = static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].tauEst);
     }
 

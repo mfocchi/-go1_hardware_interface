@@ -26,7 +26,6 @@
 
 #include "go1_interface/go1_robot_hw.hpp"
 
-
 namespace go12ros {
 
 class Go1ROSControl {
@@ -53,6 +52,10 @@ private:
 
   /** @brief controller_manager provides the infrastructure to load, unload, start and stop controllers */
 	std::shared_ptr<controller_manager::ControllerManager> controller_manager_;
+
+
+
+
 };
 
 } // namespace

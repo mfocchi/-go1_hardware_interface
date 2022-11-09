@@ -29,6 +29,9 @@
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Vector3.h>
 
+typedef Eigen::Matrix<double, 6,1> butterFilterParams;  
+
+
 namespace go12ros
 {
 
@@ -68,6 +71,8 @@ private:
   /** @brief IMU realtime publisher */
   std::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry>> odom_pub_;
   std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::Vector3>> imu_acc_pub_;
+  std::vector<butterFilterParams> velocityFilterBuffer;
+  void filt(const double raw, butterFilterParams & filt);
 
 };
 
