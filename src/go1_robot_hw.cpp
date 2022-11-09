@@ -118,14 +118,14 @@ void Go1RobotHw::filt(const double raw, butterFilterParams & buffer)
 //double a[3] = {1.0000 ,  -0.4629 ,  0.2097};
 //double b[3] = {0.1867 ,   0.3734 ,  0.1867};
 //2nd order butterworth cut 250 for fs = 1000 Hz
-    double a[3] = { 1.0000, 0.0000, 0.1716 };
-    double b[3] = { 0.2929, 0.5858, 0.2929 };
+//    double a[3] = { 1.0000, 0.0000, 0.1716 };
+//    double b[3] = { 0.2929, 0.5858, 0.2929 };
 //2nd order butterworth cut 40
 //double a[3] = {1.0000000e+00,  -3.6952738e-01 ,  1.9581571e-01};
 //double b[3] = {2.0657208e-01 ,  4.1314417e-01 ,  2.0657208e-01};
 //2nd order butterworth 30
-//double a[3] = {1.0000000e+00,  -7.4778918e-01,   2.7221494e-01};
-//double b[3] = {1.3110644e-01 ,  2.6221288e-01,   1.3110644e-01};
+double a[3] = {1.0000000e+00,  -7.4778918e-01,   2.7221494e-01};
+double b[3] = {1.3110644e-01 ,  2.6221288e-01,   1.3110644e-01};
 //2nd order butterworth 15
 //double a[3] = {1.0000000e+00 , -1.3489677e+00 ,  5.1398189e-01 };
 //double b[3] = {4.1253537e-02 ,  8.2507074e-02,   4.1253537e-02};
@@ -140,6 +140,7 @@ void Go1RobotHw::filt(const double raw, butterFilterParams & buffer)
 
     buffer[input + 2] = buffer[input + 1];
     buffer[input + 1] = buffer[input + 0];
+    buffer[input] = buffer[2];
     buffer[2] = buffer[1];
     buffer[1] = buffer[0];
 }
