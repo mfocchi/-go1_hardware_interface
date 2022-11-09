@@ -27,6 +27,7 @@
 #include <eigen3/Eigen/Dense>
 #include <realtime_tools/realtime_publisher.h>
 #include <nav_msgs/Odometry.h>
+#include <geometry_msgs/Vector3.h>
 
 namespace go12ros
 {
@@ -66,6 +67,7 @@ private:
 
   /** @brief IMU realtime publisher */
   std::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry>> odom_pub_;
+  std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::Vector3>> imu_acc_pub_;
 
 };
 
