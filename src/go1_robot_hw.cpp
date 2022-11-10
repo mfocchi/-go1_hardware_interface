@@ -95,7 +95,7 @@ void Go1RobotHw::init()
 
     ros::NodeHandle root_nh;
     odom_pub_.reset(new realtime_tools::RealtimePublisher<nav_msgs::Odometry>(root_nh,	"/go1/ground_truth", 1));
-    imu_acc_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::Vector3>(root_nh,	"/go1/imu_acc", 1));
+    imu_acc_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::Vector3>(root_nh,	"/go1/trunk_imu", 1));
 
 }
 
@@ -157,8 +157,8 @@ void Go1RobotHw::read()
     {
         joint_position_[jj] = static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].q)     ;
 
-	filt(static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].dq) , velocityFilterBuffer[jj]);
-        joint_velocity_[jj] = velocityFilterBuffer[jj][0];
+	//filt(static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].dq) , velocityFilterBuffer[jj]);
+        joint_velocity_[jj] = static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].dq) ;//velocityFilterBuffer[jj][0];
 
         joint_effort_[jj]   = static_cast<double>(go1_state_.motorState[go1_motor_idxs_[jj]].tauEst);
     }
