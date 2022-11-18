@@ -68,7 +68,7 @@ void Go1RobotHw::init()
 	       velocityFilterBuffer[i][3] = 0.0;
 	       velocityFilterBuffer[i][4] = 0.0;
 	       velocityFilterBuffer[i][5] = 0.0;
-	}
+	    }
 
     }
     else
@@ -96,6 +96,7 @@ void Go1RobotHw::init()
     ros::NodeHandle root_nh;
     odom_pub_.reset(new realtime_tools::RealtimePublisher<nav_msgs::Odometry>(root_nh,	"/go1/ground_truth", 1));
     imu_acc_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::Vector3>(root_nh,	"/go1/trunk_imu", 1));
+    imu_euler_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::Vector3>(root_nh,	"/go1/euler_imu", 1));
 
 }
 
@@ -171,6 +172,10 @@ void Go1RobotHw::read()
     imu_orientation_[2] = static_cast<double>(go1_state_.imu.quaternion[2]);  // y
     imu_orientation_[3] = static_cast<double>(go1_state_.imu.quaternion[3]);  // z
 
+    imu_euler_[0] = static_cast<double>(go1_state_.imu.rpy[0]);  // R
+    imu_euler_[1] = static_cast<double>(go1_state_.imu.rpy[1]);  // P
+    imu_euler_[2] = static_cast<double>(go1_state_.imu.rpy[2]);  // Y
+
     imu_ang_vel_[0] = static_cast<double>(go1_state_.imu.gyroscope[0]);
     imu_ang_vel_[1] = static_cast<double>(go1_state_.imu.gyroscope[1]);
     imu_ang_vel_[2] = static_cast<double>(go1_state_.imu.gyroscope[2]);
@@ -204,6 +209,16 @@ void Go1RobotHw::read()
       
       imu_acc_pub_->unlockAndPublish();
     }
+
+    if(imu_euler_pub_.get() && imu_euler_pub_->trylock())
+    {
+      imu_euler_pub_->msg_.x = imu_euler_[0];
+      imu_euler_pub_->msg_.y = imu_euler_[1];
+      imu_euler_pub_->msg_.z = imu_euler_[2];
+      
+      imu_euler_pub_->unlockAndPublish();
+    }
+
 }
 
 void Go1RobotHw::write()
