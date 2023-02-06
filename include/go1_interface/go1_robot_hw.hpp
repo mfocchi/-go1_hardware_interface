@@ -80,6 +80,7 @@ private:
   std::vector<double> remove_euler_;
   std::vector<double> remove_quaternion_;
   bool is_remove_yaw_set_ = false;
+  unsigned int base_pub_counter = 0;
 
 };
 

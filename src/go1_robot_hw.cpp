@@ -198,68 +198,70 @@ void Go1RobotHw::read()
       remove_quaternion_[3] = sin(remove_euler_[2]/2); // z
       is_remove_yaw_set_ = true;
     }
-
-    imu_orientation_raw_[0] = static_cast<double>(go1_state_.imu.quaternion[0]);  // w
-    imu_orientation_raw_[1] = static_cast<double>(go1_state_.imu.quaternion[1]);  // x
-    imu_orientation_raw_[2] = static_cast<double>(go1_state_.imu.quaternion[2]);  // y
-    imu_orientation_raw_[3] = static_cast<double>(go1_state_.imu.quaternion[3]);  // z
-
-    imu_orientation_[0] = remove_quaternion_[0] * imu_orientation_raw_[0] - remove_quaternion_[3] * imu_orientation_raw_[3];
-    imu_orientation_[1] = remove_quaternion_[0] * imu_orientation_raw_[1] - remove_quaternion_[3] * imu_orientation_raw_[2];
-    imu_orientation_[2] = remove_quaternion_[0] * imu_orientation_raw_[2] + remove_quaternion_[3] * imu_orientation_raw_[1];
-    imu_orientation_[3] = remove_quaternion_[0] * imu_orientation_raw_[3] + remove_quaternion_[3] * imu_orientation_raw_[0];
-
-
-    imu_euler_raw_[0] = static_cast<double>(go1_state_.imu.rpy[0]);  // R
-    imu_euler_raw_[1] = static_cast<double>(go1_state_.imu.rpy[1]);  // P
-    imu_euler_raw_[2] = static_cast<double>(go1_state_.imu.rpy[2]);  // Y
-    imu_euler_[0] = imu_euler_raw_[0] + remove_euler_[0];
-    imu_euler_[1] = imu_euler_raw_[1] + remove_euler_[1];
-    imu_euler_[2] = imu_euler_raw_[2] + remove_euler_[2];
-
-    imu_ang_vel_[0] = static_cast<double>(go1_state_.imu.gyroscope[0]);
-    imu_ang_vel_[1] = static_cast<double>(go1_state_.imu.gyroscope[1]);
-    imu_ang_vel_[2] = static_cast<double>(go1_state_.imu.gyroscope[2]);
-
-    imu_lin_acc_[0] = static_cast<double>(go1_state_.imu.accelerometer[0]);
-    imu_lin_acc_[1] = static_cast<double>(go1_state_.imu.accelerometer[1]);
-    imu_lin_acc_[2] = static_cast<double>(go1_state_.imu.accelerometer[2]);
-
-
-    // Publish the IMU data NOTE: missing covariances
-    if(odom_pub_.get() && odom_pub_->trylock())
+    if ( base_pub_counter%4 == 0)
     {
-      odom_pub_->msg_.pose.pose.orientation.w         = imu_orientation_[0];
-      odom_pub_->msg_.pose.pose.orientation.x         = imu_orientation_[1];
-      odom_pub_->msg_.pose.pose.orientation.y         = imu_orientation_[2];
-      odom_pub_->msg_.pose.pose.orientation.z         = imu_orientation_[3];
-      odom_pub_->msg_.twist.twist.angular.x    = imu_ang_vel_[0];
-      odom_pub_->msg_.twist.twist.angular.y    = imu_ang_vel_[1];
-      odom_pub_->msg_.twist.twist.angular.z    = imu_ang_vel_[2];
+        imu_orientation_raw_[0] = static_cast<double>(go1_state_.imu.quaternion[0]);  // w
+        imu_orientation_raw_[1] = static_cast<double>(go1_state_.imu.quaternion[1]);  // x
+        imu_orientation_raw_[2] = static_cast<double>(go1_state_.imu.quaternion[2]);  // y
+        imu_orientation_raw_[3] = static_cast<double>(go1_state_.imu.quaternion[3]);  // z
 
-      odom_pub_->msg_.header.stamp = ros::Time::now();
-      odom_pub_->unlockAndPublish();
+        imu_orientation_[0] = remove_quaternion_[0] * imu_orientation_raw_[0] - remove_quaternion_[3] * imu_orientation_raw_[3];
+        imu_orientation_[1] = remove_quaternion_[0] * imu_orientation_raw_[1] - remove_quaternion_[3] * imu_orientation_raw_[2];
+        imu_orientation_[2] = remove_quaternion_[0] * imu_orientation_raw_[2] + remove_quaternion_[3] * imu_orientation_raw_[1];
+        imu_orientation_[3] = remove_quaternion_[0] * imu_orientation_raw_[3] + remove_quaternion_[3] * imu_orientation_raw_[0];
+
+
+        imu_euler_raw_[0] = static_cast<double>(go1_state_.imu.rpy[0]);  // R
+        imu_euler_raw_[1] = static_cast<double>(go1_state_.imu.rpy[1]);  // P
+        imu_euler_raw_[2] = static_cast<double>(go1_state_.imu.rpy[2]);  // Y
+        imu_euler_[0] = imu_euler_raw_[0] + remove_euler_[0];
+        imu_euler_[1] = imu_euler_raw_[1] + remove_euler_[1];
+        imu_euler_[2] = imu_euler_raw_[2] + remove_euler_[2];
+
+        imu_ang_vel_[0] = static_cast<double>(go1_state_.imu.gyroscope[0]);
+        imu_ang_vel_[1] = static_cast<double>(go1_state_.imu.gyroscope[1]);
+        imu_ang_vel_[2] = static_cast<double>(go1_state_.imu.gyroscope[2]);
+
+        imu_lin_acc_[0] = static_cast<double>(go1_state_.imu.accelerometer[0]);
+        imu_lin_acc_[1] = static_cast<double>(go1_state_.imu.accelerometer[1]);
+        imu_lin_acc_[2] = static_cast<double>(go1_state_.imu.accelerometer[2]);
+
+
+        // Publish the IMU data NOTE: missing covariances
+        if(odom_pub_.get() && odom_pub_->trylock())
+        {
+          odom_pub_->msg_.pose.pose.orientation.w         = imu_orientation_[0];
+          odom_pub_->msg_.pose.pose.orientation.x         = imu_orientation_[1];
+          odom_pub_->msg_.pose.pose.orientation.y         = imu_orientation_[2];
+          odom_pub_->msg_.pose.pose.orientation.z         = imu_orientation_[3];
+          odom_pub_->msg_.twist.twist.angular.x    = imu_ang_vel_[0];
+          odom_pub_->msg_.twist.twist.angular.y    = imu_ang_vel_[1];
+          odom_pub_->msg_.twist.twist.angular.z    = imu_ang_vel_[2];
+
+          odom_pub_->msg_.header.stamp = ros::Time::now();
+          odom_pub_->unlockAndPublish();
+        }
+
+
+        if(imu_acc_pub_.get() && imu_acc_pub_->trylock())
+        {
+          imu_acc_pub_->msg_.x = imu_lin_acc_[0];
+          imu_acc_pub_->msg_.y = imu_lin_acc_[1];
+          imu_acc_pub_->msg_.z = imu_lin_acc_[2];
+          
+          imu_acc_pub_->unlockAndPublish();
+        }
+
+        if(imu_euler_pub_.get() && imu_euler_pub_->trylock())
+        {
+          imu_euler_pub_->msg_.x = imu_euler_[0];
+          imu_euler_pub_->msg_.y = imu_euler_[1];
+          imu_euler_pub_->msg_.z = imu_euler_[2];
+          
+          imu_euler_pub_->unlockAndPublish();
+        }
     }
-
-
-    if(imu_acc_pub_.get() && imu_acc_pub_->trylock())
-    {
-      imu_acc_pub_->msg_.x = imu_lin_acc_[0];
-      imu_acc_pub_->msg_.y = imu_lin_acc_[1];
-      imu_acc_pub_->msg_.z = imu_lin_acc_[2];
-      
-      imu_acc_pub_->unlockAndPublish();
-    }
-
-    if(imu_euler_pub_.get() && imu_euler_pub_->trylock())
-    {
-      imu_euler_pub_->msg_.x = imu_euler_[0];
-      imu_euler_pub_->msg_.y = imu_euler_[1];
-      imu_euler_pub_->msg_.z = imu_euler_[2];
-      
-      imu_euler_pub_->unlockAndPublish();
-    }
-
+    base_pub_counter++;
 }
 
 void Go1RobotHw::write()
