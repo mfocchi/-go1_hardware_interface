@@ -117,7 +117,7 @@ void Go1RobotHw::init()
     odom_pub_.reset(new realtime_tools::RealtimePublisher<nav_msgs::Odometry>(root_nh,	"/go1/ground_truth", 1));
     imu_acc_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::Vector3>(root_nh,	"/go1/trunk_imu", 1));
     imu_euler_pub_.reset(new realtime_tools::RealtimePublisher<geometry_msgs::Vector3>(root_nh,	"/go1/euler_imu", 1));
-
+    contact_state_pub_.reset(new realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>(root_nh,	"/go1/contact_force_z", 1));
 }
 
 
@@ -188,6 +188,9 @@ void Go1RobotHw::read()
     // IMU
     // ---
   
+ //feet contact forces z
+
+
   if (not is_remove_yaw_set_)
     {
       // These lines remove init yaw of the robot
@@ -262,6 +265,20 @@ void Go1RobotHw::read()
         }
     }
     base_pub_counter++;
+
+      // Publish the IMU data NOTE: missing covariances
+      if(contact_state_pub_.get() && contact_state_pub_->trylock())
+      {
+        contact_state_pub_->msg_.data.clear();     
+
+        contact_state_pub_->msg_.data.push_back(go1_state_.footForce[1]); //LF
+        contact_state_pub_->msg_.data.push_back(go1_state_.footForce[3]); //LH
+        contact_state_pub_->msg_.data.push_back(go1_state_.footForce[0]); //RF
+        contact_state_pub_->msg_.data.push_back(go1_state_.footForce[2]); //RH
+        //std::cout<<go1_state_.footForce[0]<<std::endl;
+              
+        contact_state_pub_->unlockAndPublish();
+      }
 }
 
 void Go1RobotHw::write()

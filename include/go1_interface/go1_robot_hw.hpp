@@ -28,6 +28,7 @@
 #include <realtime_tools/realtime_publisher.h>
 #include <nav_msgs/Odometry.h>
 #include <geometry_msgs/Vector3.h>
+#include <std_msgs/Float64MultiArray.h>
 
 typedef Eigen::Matrix<double, 6,1> butterFilterParams;  
 
@@ -72,6 +73,7 @@ private:
   std::shared_ptr<realtime_tools::RealtimePublisher<nav_msgs::Odometry>> odom_pub_;
   std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::Vector3>> imu_acc_pub_;
   std::shared_ptr<realtime_tools::RealtimePublisher<geometry_msgs::Vector3>> imu_euler_pub_;
+  std::shared_ptr<realtime_tools::RealtimePublisher<std_msgs::Float64MultiArray>> contact_state_pub_;
   std::vector<butterFilterParams> velocityFilterBuffer;
   void filt(const double raw, butterFilterParams & filt);
 
@@ -81,7 +83,8 @@ private:
   std::vector<double> remove_quaternion_;
   bool is_remove_yaw_set_ = false;
   unsigned int base_pub_counter = 0;
-
+  std_msgs::Float64MultiArray msg;
+  std::vector<float> contact_vec;
 };
 
 }
